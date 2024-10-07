@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">apiresponse</string>
+    <string name="desc">desc</string>
+    <string name="des">des</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+</resources>
