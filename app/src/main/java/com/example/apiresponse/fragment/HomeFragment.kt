@@ -48,9 +48,7 @@ class HomeFragment : Fragment() {
 
         // Observe the users from the ViewModel
         userViewModel.users.observe(viewLifecycleOwner) { users ->
-            if (!users.isNullOrEmpty()) {
-                userAdapter.updateUsers(users)
-            }
+            userAdapter.updateUsers(users)
         }
 
         // Fetch users from the API

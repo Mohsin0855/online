@@ -48,10 +48,9 @@ class FavouriteFragment : Fragment() {
         // Observe favorite users from the ViewModel
         userViewModel.favoriteUsers.observe(viewLifecycleOwner) { favoriteUsers ->
             if (!favoriteUsers.isNullOrEmpty()) {
-                userAdapter.updateUsers(favoriteUsers)
-            } else {
                 Toast.makeText(requireContext(), "No favorite users found", Toast.LENGTH_SHORT).show()
             }
+            userAdapter.updateUsers(favoriteUsers)
         }
     }
 }
