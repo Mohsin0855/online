@@ -1,76 +1,110 @@
 package com.example.apiresponse.adaptor
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.apiresponse.R
-import com.example.apiresponse.data.User
-import com.example.apiresponse.databinding.UserBinding
+import com.example.apiresponse.db.UserEntity
 
-class UserAdapter (private var users: List<User>) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
-    inner class UserViewHolder( val binding: UserBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: User) {
-            Glide.with(binding.root.context)
-                .load(user.photo)
-                .into(binding.profileImageView)
+class UserAdapter(
+    private var users: List<UserEntity>,
+    private val onFavoriteToggle: (UserEntity) -> Unit,
+    private val archiveUser: (UserEntity) -> Unit,
+    private val onRenameUser: (UserEntity, String) -> Unit
 
-            binding.nameTextView.text = user.name
-            binding.emailTextView.text = user.email
+) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
-            binding.favoriteButton.setOnLongClickListener {
-                showPopupMenu(it.context, binding.favoriteButton, user)
-                true // Return true to indicate the long press was handled
-            }
+    class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val name: TextView = view.findViewById(R.id.nameTextView)
+        val email: TextView = view.findViewById(R.id.emailTextView)
+        val photo: ImageView = view.findViewById(R.id.profileImageView)
+        val moreMenu: ImageView = view.findViewById(R.id.favoriteButton)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.user, parent, false)
+        return UserViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        val user = users[position]
+
+        holder.name.text = user.name
+        holder.email.text = user.email
+
+        Glide.with(holder.itemView.context)
+            .load(user.photoUrl)
+            .into(holder.photo)
+
+        // Update favorite button icon based on isFavorite status
+        holder.moreMenu.setImageResource(
+            if (user.isFavorite) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24
+        )
+
+        // Inside UserAdapter
+        holder.moreMenu.setOnClickListener {
+            // Call the ViewModel's function to toggle the favorite status of the user
+            onFavoriteToggle(user)
         }
-        private fun showPopupMenu(context: Context, view: View, user: User) {
-            val popupMenu = PopupMenu(context, view)
-            popupMenu.menuInflater.inflate(R.menu.menu_user_options, popupMenu.menu)
 
-            // Handle menu item clicks
+
+        holder.moreMenu.setOnLongClickListener { view ->
+            val popupMenu = PopupMenu(view.context, view)
+            popupMenu.inflate(R.menu.menu_user_options)
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_rename -> {
-                        // Handle rename action
-                        Log.d("UserAdapter", "Rename clicked for user: ${user.name}")
+                        showRenameDialog(holder.itemView.context, user)
                         true
                     }
                     R.id.action_archive -> {
-                        // Handle archive action
-                        Log.d("UserAdapter", "Archive clicked for user: ${user.name}")
+                        archiveUser(user)
                         true
                     }
                     else -> false
                 }
             }
             popupMenu.show()
+            true // Returning true to indicate that the long press event was handled
         }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder{
-        val binding = UserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return UserViewHolder(binding)
-    }
-
-
-
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val user = users[position]
-        holder.bind(user)
-        holder.binding.nameTextView.text = user.name
-        holder.binding.emailTextView.text = user.email
-        Log.d("UserAdapter", "Binding user: ${user.name}")
     }
 
     override fun getItemCount(): Int = users.size
 
-    // Method to update the user list and notify the adapter
-    fun updateUsers(newUsers: List<User>) {
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateUsers(newUsers: List<UserEntity>) {
         users = newUsers
-        notifyDataSetChanged() // Notify the adapter that the data has changed
+        notifyDataSetChanged()
+
     }
+
+    private fun showRenameDialog(context: Context, user: UserEntity) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_rename_user, null)
+        val editText = dialogView.findViewById<EditText>(R.id.editTextNewName)
+
+        val dialog = AlertDialog.Builder(context)
+            .setTitle("Rename User")
+            .setView(dialogView)
+            .setPositiveButton("Rename") { _, _ ->
+                val newName = editText.text.toString()
+                if (newName.isNotEmpty()) {
+                    onRenameUser(user, newName) // Call rename handler
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
 }

@@ -8,18 +8,14 @@ import com.example.apiresponse.fragment.FavouriteFragment
 import com.example.apiresponse.fragment.HomeFragment
 
 class ViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
-    private val fragmentList = listOf(
-        HomeFragment(),
-        FavouriteFragment(),
-        ArchiveFragment()
-    )
-
-    override fun getItemCount(): Int {
-        return fragmentList.size
-    }
-
+    override fun getItemCount(): Int = 3
 
     override fun createFragment(position: Int): Fragment {
-        return fragmentList[position]
+        return when (position) {
+            0 -> HomeFragment()
+            1 -> FavouriteFragment()
+            2 -> ArchiveFragment()
+            else -> HomeFragment()
+        }
     }
 }

@@ -1,6 +1,6 @@
-package com.example.apiresponse.data
+package com.example.apiresponse.api
 
-data class User(
+data class ApiResponse(
     val id: Int,
     val name: String,
     val email: String,

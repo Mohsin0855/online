@@ -4,4 +4,5 @@
     <string name="des">des</string>
     <string name="name">Name</string>
     <string name="email">Email</string>
+    <string name="internet">No Internet Connection</string>
 </resources>

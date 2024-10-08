@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -51,12 +52,26 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.glide)
-    annotationProcessor (libs.compiler)
+    kapt (libs.compiler)
     implementation (libs.logging.interceptor)
+
+
 
     implementation (libs.androidx.lifecycle.extensions)
     implementation (libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.activity.ktx)
     implementation (libs.androidx.fragment.ktx)
+    implementation (libs.androidx.room.ktx)
+  //noinspection KaptUsageInsteadOfKsp
+  //kapt (libs.androidx.room.compiler)
+
+
+    implementation (libs.androidx.room.runtime)
+    annotationProcessor (libs.androidx.room.compiler)
+
+    // To use Kotlin annotation processing tool (kapt)
+    kapt (libs.androidx.room.compiler)
+ //  kapt(libs.androidx.room.compiler.v250)
+    implementation (libs.kotlinx.coroutines.android)
 }
